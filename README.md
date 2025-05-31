@@ -10,12 +10,14 @@ https://samplesizes.streamlit.app/
 
 ## Features
 ✅ Choose between comparing conversion rates or means
+
 ✅ Customize:
 - Baseline value
 - Expected lift or delta
 - Alpha level (significance threshold)
 - Statistical power (e.g. 80%, 90%)
 - Alternative hypothesis test (two-sided, smaller, larger)
+  
 ✅ Clear Results:
 - Required sample size per group
 - Explanations
