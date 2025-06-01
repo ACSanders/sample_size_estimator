@@ -60,19 +60,22 @@ def create_download_df(test_type, sample_size, alpha, power, inputs):
 
 # Title
 st.title("Sample Size Estimator")
+# subheader
+st.subheader("Calculate the sample size required to detect significant differences in group rates or means for your A/B test")
 
 # User Inputs for (1) test type, (2) alpha level, (3) power, and (4) alterantive hypothesis
-test_type = st.radio("What type of hypothesis test?", ["Proportions or Rates", "Means"])
+test_type = st.radio("Select the type of hypothesis test", ["Difference in Group Rates (proportion test)", "Difference in Group Means (t-test)"])
 alpha = st.number_input("Significance Level (alpha)", min_value = 0.001, max_value = 0.2, value = 0.05, step = 0.001, format = "%.3f")
 power = st.number_input("Statistical Power", min_value = 0.5, max_value = 0.99, value = 0.8, step = 0.01, format = "%.2f")
-alternative = st.selectbox("Alternative Hypothesis", options = ["two-sided", "larger", "smaller"])
+alternative = st.selectbox("Alternative Hypothesis", options = ["two-sided", "larger", "smaller"],
+                           help = "Choose 'two-sided' if the effect could be an increase or a decrease, 'larger' if you expect only an increase, or 'smaller' if you expect only a decrease.")
 
 st.divider()
 
 # Proportion selection
-if test_type == "Proportions or Rates":
+if test_type == "Difference in Group Rates (proportion test)":
     st.subheader("Proportion-Based Inputs")
-    p1 = st.number_input("Baseline Rate (Control Group)", min_value=0.0, max_value=1.0, value=0.1, step=0.01, format="%.3f")
+    p1 = st.number_input("Baseline Rate (Control Group)", min_value = 0.0, max_value = 1.0, value = 0.1, step = 0.01, format = "%.3f")
     delta = st.number_input("Expected Lift or Change (must be absolute value, e.g. 0.02 = 2 percentage points)", min_value = -1.0, max_value = 1.0, value = 0.02, step = 0.005, format = "%.3f")
     p2 = p1 + delta
 
@@ -86,7 +89,7 @@ if test_type == "Proportions or Rates":
         # if the validations are passed then run the sample size calculations
         else:
             sample_size = sample_size_proportions(p1, p2, alpha, power, alternative)
-            st.success(f"✅ Estimation calculation completed!") # success
+            st.success(f"✅ Analysis completed!") # success
             st.metric(label = "Sample size per group", value = sample_size)
             # generate the explanation of the results
             st.info(generate_explanation("Proportions", sample_size, alpha, power, alternative, delta))
@@ -112,7 +115,7 @@ elif test_type == "Means":
     st.subheader("Mean-Based Inputs")
     # get user inputs and delta
     mean1 = st.number_input("Baseline Mean (Control Group)", value = 50.0, step = 1.0)
-    delta = st.number_input("Expected Lift or Change (must be absolute value, e.g. 5 = +5 or -5)", value = 5.0, step = 0.5)
+    delta = st.number_input("Expected Lift or Change (must be absolute value, e.g. 5 = +5 or -5 delta)", value = 5.0, step = 0.5)
     mean2 = mean1 + delta
     # pooled std -- this needs to be provided (use the control group)
     std_dev = st.number_input("Standard Deviation", min_value = 0.01, value = 10.0, step = 0.5) 
@@ -128,7 +131,7 @@ elif test_type == "Means":
         # if validations are passed then run the estimate
         else:
             sample_size = sample_size_means(mean1, mean2, std_dev, alpha, power, alternative)
-            st.success(f"✅ Estimation calculation completed!") # success
+            st.success(f"✅ Analysis completed!") # success
             st.metric(label = "Sample size per group", value = sample_size)
             st.info(generate_explanation("Means", sample_size, alpha, power, alternative, delta))
             # inputs for the results
