@@ -18,12 +18,24 @@ import plotly.graph_objects as go
 # sample size for proportions
 def sample_size_proportions(p1, p2, alpha, power, alternative):
     effect_size = proportion_effectsize(p1, p2)
+    # If larger or smaller is selected make sure to use absolute value so as not to cause issues
+    if alternative in ["larger", "smaller"]:
+        effect_size = abs(effect_size)
+
     result = zt_ind_solve_power(effect_size=effect_size, alpha=alpha, power=power, alternative=alternative)
     return round(float(result))
 
 # sample size for means
 def sample_size_means(mean1, mean2, std_dev, alpha, power, alternative):
-    effect_size = abs(mean2 - mean1) / std_dev
+    raw_effect = abs(mean2 - mean1) / std_dev
+    # similar to proportion function, I need to handle effect size for one-sided cases
+    if alternative == "two-sided":
+        effect_size = abs(raw_effect)
+    elif alternative == "larger":
+        effect_size = abs(raw_effect)  # positive
+    elif alternative == "smaller":
+        effect_size = -abs(raw_effect)  # negative
+        
     analysis = TTestIndPower()
     result = analysis.solve_power(effect_size=effect_size, alpha=alpha, power=power, alternative=alternative)
     return round(float(result))
