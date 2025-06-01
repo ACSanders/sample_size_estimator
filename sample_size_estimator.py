@@ -77,9 +77,23 @@ st.divider()
 # Proportion selection
 if test_type == "Difference in Group Rates (proportion test)":
     st.subheader("Baseline and Delta Inputs for Difference in Proportions")
-    p1 = st.number_input("Baseline Rate (Control Group)", min_value = 0.0, max_value = 1.0, value = 0.1, step = 0.01, format = "%.3f")
-    delta = st.number_input("Expected Lift or Change (must be absolute value, e.g. 0.02 = 2 percentage points)", min_value = -1.0, max_value = 1.0, value = 0.02, step = 0.005, format = "%.3f")
-    p2 = p1 + delta
+    p1 = st.number_input("Baseline Rate (Control Group)", min_value = 0.0, max_value = 1.0, value = 0.1, step = 0.01, format = "%.3f",
+                         help = "The rate for the baseline group (e.g., 0.1 means a 10% rate)")
+    delta = st.number_input(
+        "Expected Lift or Change (must be absolute value)",
+        min_value=0.0,
+        max_value=1.0,
+        value=0.02,
+        step=0.005,
+        format="%.3f",
+        help="The expected absolute difference in conversion rate (e.g., 0.02 = +2 or -2 percentage points). Enter a positive number. The analysis will apply the correct direction (+ or -) based on the 'Alternative Hypothesis' selection."
+    )
+
+    # to get the right proportion for group 2, we need to take into account the delta and type of alternative hypothesis test selected
+    if alternative == "smaller":
+        p2 = p1 - abs(delta)
+    else:
+        p2 = p1 + abs(delta)
 
     # calculation button
     if st.button("Calculate Sample Size"):
@@ -89,6 +103,8 @@ if test_type == "Difference in Group Rates (proportion test)":
         elif np.isnan(p1) or np.isnan(p2):
             st.error("❌ Invalid numerical input for one or more proportions")
         # if the validations are passed then run the sample size calculations
+        elif abs(delta) < 0.0001:
+            st.error("❌ The expected change value is too small to detect meaningfully. Input a larger value.")
         else:
             sample_size = sample_size_proportions(p1, p2, alpha, power, alternative)
             st.success(f"✅ Analysis completed!") # success
@@ -101,8 +117,10 @@ if test_type == "Difference in Group Rates (proportion test)":
                 "delta": delta,
                 "expected": p2
             }
+
             # make a dataframe of the results
             df_result = create_download_df("Proportions", sample_size, alpha, power, inputs)
+
             # make csv for downloading
             csv = df_result.to_csv(index=False).encode("utf-8") # utf-8 should be compatible with most 
             st.download_button(
@@ -116,11 +134,24 @@ if test_type == "Difference in Group Rates (proportion test)":
 elif test_type == "Difference in Group Means (t-test)":
     st.subheader("Baseline and Delta Inputs for Difference in Means")
     # get user inputs and delta
-    mean1 = st.number_input("Baseline Mean (Control Group)", value = 50.0, step = 1.0)
-    delta = st.number_input("Expected Lift or Change (must be absolute value, e.g. 5 = +5 or -5 delta)", value = 5.0, step = 0.5)
-    mean2 = mean1 + delta
+    mean1 = st.number_input("Baseline Mean (Control Group)", value = 50.0, step = 1.0,
+                            help = "The average value for your baseline group")
+    delta = st.number_input(
+        "Expected Lift or Change (must be absolute value)",
+        value=5.0,
+        step=0.5,
+        help="The size of the effect you want to detect. Enter a positive number (e.g., 5 = +5 or -5). The analysis will apply the correct direction based on the 'Alternative Hypothesis' selection."
+    )
+
+    # get the right mean based on the alternative parmater - if smaller then we need mean2 to be mean1 - delta
+    if alternative == "smaller":
+        mean2 = mean1 - abs(delta)
+    else:
+        mean2 = mean1 + abs(delta)
+
     # pooled std -- this needs to be provided (use the control group)
     std_dev = st.number_input("Standard Deviation", min_value = 0.01, value = 10.0, step = 0.5) 
+
     # calculate
     if st.button("Calculate Sample Size"):
         # validation and checks
@@ -142,8 +173,10 @@ elif test_type == "Difference in Group Means (t-test)":
                 "delta": delta,
                 "expected": mean2
             }
+
             # make dataframe of results
             df_result = create_download_df("Means", sample_size, alpha, power, inputs)
+            
             # download the results
             csv = df_result.to_csv(index=False).encode("utf-8")
             st.download_button(
