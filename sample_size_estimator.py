@@ -76,7 +76,7 @@ st.divider()
 
 # Proportion selection
 if test_type == "Difference in Group Rates (proportion test)":
-    st.subheader("Proportion-Based Inputs")
+    st.subheader("Baseline and Delta Inputs for Difference in Proportions")
     p1 = st.number_input("Baseline Rate (Control Group)", min_value = 0.0, max_value = 1.0, value = 0.1, step = 0.01, format = "%.3f")
     delta = st.number_input("Expected Lift or Change (must be absolute value, e.g. 0.02 = 2 percentage points)", min_value = -1.0, max_value = 1.0, value = 0.02, step = 0.005, format = "%.3f")
     p2 = p1 + delta
@@ -113,8 +113,8 @@ if test_type == "Difference in Group Rates (proportion test)":
             )
 
 # Run it for difference in means
-elif test_type == "Means":
-    st.subheader("Mean-Based Inputs")
+elif test_type == "Difference in Group Means (t-test)":
+    st.subheader("Baseline and Delta Inputs for Difference in Means")
     # get user inputs and delta
     mean1 = st.number_input("Baseline Mean (Control Group)", value = 50.0, step = 1.0)
     delta = st.number_input("Expected Lift or Change (must be absolute value, e.g. 5 = +5 or -5 delta)", value = 5.0, step = 0.5)
