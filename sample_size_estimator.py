@@ -7,7 +7,7 @@ import numpy as np
 
 # import statsmodels packages for power analysis and sample sizes
 from statsmodels.stats.proportion import proportion_effectsize
-from statsmodels.stats.power import NormalIndPower, TTestIndPower
+from statsmodels.stats.power import zt_ind_solve_power, TTestIndPower
 
 # import plotly for visualizations
 import plotly.express as px
@@ -18,8 +18,7 @@ import plotly.graph_objects as go
 # sample size for proportions
 def sample_size_proportions(p1, p2, alpha, power, alternative):
     effect_size = proportion_effectsize(p1, p2)
-    analysis = NormalIndPower()
-    result = analysis.solve_power(effect_size=effect_size, alpha=alpha, power=power, alternative=alternative)
+    result = zt_ind_solve_power(effect_size=effect_size, alpha=alpha, power=power, alternative=alternative)
     return round(float(result))
 
 # sample size for means
