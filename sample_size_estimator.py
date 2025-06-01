@@ -63,6 +63,8 @@ st.title("Sample Size Estimator")
 # subheader
 st.subheader("Calculate the sample size required to detect significant differences in group rates or means for your A/B test")
 
+st.divider()
+
 # User Inputs for (1) test type, (2) alpha level, (3) power, and (4) alterantive hypothesis
 test_type = st.radio("Select the type of hypothesis test", ["Difference in Group Rates (proportion test)", "Difference in Group Means (t-test)"])
 alpha = st.number_input("Significance Level (alpha)", min_value = 0.001, max_value = 0.2, value = 0.05, step = 0.001, format = "%.3f")
