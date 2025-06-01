@@ -6,8 +6,8 @@ import pandas as pd
 import numpy as np
 
 # import statsmodels packages for power analysis and sample sizes
-from statsmodels.stats.proportion import proportion_effectsize
-from statsmodels.stats.power import zt_ind_solve_power, TTestIndPower
+from statsmodels.stats.proportion import proportion_effectsize, zt_ind_solve_power
+from statsmodels.stats.power import TTestIndPower
 
 # import plotly for visualizations
 import plotly.express as px
